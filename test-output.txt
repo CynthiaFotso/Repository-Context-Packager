@@ -1,0 +1,320 @@
+# Repository Context
+
+## File System Location
+
+C:\Users\cynth\Computer Programming and Analysis\Sem 6\OSD 600\Repository-Context-Packager
+
+## Git Info
+
+- Commit: 804713fce60a6cd95c0d529aa6dae6dde4329544
+      - Branch: main
+      - Author: Cynthia Fotso <cynthiafotso8@gmail.com>
+      - Date: 2025-09-10T14:10:08-04:00
+
+## Structure
+```
+
+  bin
+    cli.js
+  LICENSE
+  package-lock.json
+  package.json
+  README.md
+  src
+    index.js
+    utils.js
+
+```
+
+## File Contents
+
+
+### File: bin\cli.js
+
+```js
+
+#!/usr/bin/env node
+
+import { Command } from "commander";
+import { packageRepo } from "../src/index.js";
+
+const program = new Command();
+
+program
+  .name("repo-context-packager")
+  .description("Package repository content for LLMs")
+  .version("0.1.0")
+  .argument("[paths...]", "Files or directories to analyze", ["."])
+  .option("-o, --output <file>", "Write output to file instead of stdout")
+  
+  .option("--include <patterns>", "Comma-separated glob patterns for files to include")
+  
+  .parse(process.argv);
+
+const options = program.opts();
+const paths = program.args.length ? program.args : ["."];
+
+packageRepo(paths, options);
+
+
+```
+
+
+### File: LICENSE
+
+```
+
+MIT License
+
+Copyright (c) 2025 Cynthia Fotso
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+```
+
+
+### File: package.json
+
+```json
+
+{
+  "name": "repository-context-packager",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "A CLI tool to package repository content for LLMs",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./bin/cli.js"
+  },
+  "keywords": [],
+  "author": "Cynthia Fotso",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^14.0.0",
+    "glob": "^11.0.3",
+    "minimatch": "^10.0.3",
+    "simple-git": "^3.28.0"
+  }
+}
+
+
+```
+
+
+### File: README.md
+
+```md
+
+# Repository-Context-Packager
+
+```
+
+
+### File: src\index.js
+
+```js
+
+import fs from "fs";
+import path from "path";
+import {
+  getGitInfo,
+  matchesIncludePatterns,
+  buildTree,
+  traverseDir,
+  readFileContents,
+} from "./utils.js";
+
+export async function packageRepo(paths, options) {
+  const outputParts = [];
+
+  // 1. File system location
+  outputParts.push("# Repository Context\n");
+  outputParts.push("## File System Location\n");
+  outputParts.push(paths.map((p) => path.resolve(p)).join("\n") + "\n");
+
+  // 2. Git info
+  outputParts.push("## Git Info\n");
+  const gitInfo = await getGitInfo(paths[0]);
+  outputParts.push(gitInfo + "\n");
+
+  // 3. Structure
+  outputParts.push("## Structure\n```\n");
+  for (const p of paths) {
+    if (fs.existsSync(p)) {
+      outputParts.push(buildTree(p, "  "));
+    } else {
+      console.error(`Path not found: ${p}`);
+    }
+  }
+  outputParts.push("```\n");
+
+  // 4. File contents
+  outputParts.push("## File Contents\n");
+  let totalFiles = 0;
+  let totalLines = 0;
+
+  const includePatterns = options.include
+    ? options.include.split(",").map((p) => p.trim())
+    : null;
+
+  const processFile = (filePath) => {
+    if (!includePatterns || matchesIncludePatterns(filePath, includePatterns)) {
+      const { text, lines } = readFileContents(filePath);
+      if (text) {
+        totalFiles++;
+        totalLines += lines;
+
+        const relPath = path.relative(process.cwd(), filePath);
+        const ext = path.extname(filePath).slice(1) || "";
+        outputParts.push(`\n### File: ${relPath}\n`);
+        outputParts.push("```" + ext + "\n");
+        outputParts.push(text);
+        outputParts.push("\n```\n");
+      }
+    }
+  };
+
+  for (const p of paths) {
+    if (fs.existsSync(p)) {
+      const stats = fs.statSync(p);
+      if (stats.isFile()) {
+        processFile(p);
+      } else {
+        traverseDir(p, (filePath) => {
+          if (
+            filePath.includes("node_modules") ||
+            path.basename(filePath) === "package-lock.json" ||
+            path.basename(filePath).startsWith(".") ||
+            filePath.includes(path.join(".git", ""))
+          ) {
+            return;
+          }
+          processFile(filePath);
+        });
+      }
+    }
+  }
+
+  // 5. Summary
+  outputParts.push("\n## Summary\n");
+  outputParts.push(`- Total files: ${totalFiles}\n`);
+  outputParts.push(`- Total lines: ${totalLines}\n`);
+
+  const finalOutput = outputParts.join("\n");
+
+  if (options.output) {
+    fs.writeFileSync(options.output, finalOutput, "utf-8");
+    console.log(`Output written to ${options.output}`);
+  } else {
+    process.stdout.write(finalOutput);
+  }
+}
+
+
+```
+
+
+### File: src\utils.js
+
+```js
+
+import simpleGit from "simple-git";
+
+import { minimatch } from "minimatch";
+
+import fs from "fs";
+import path from "path"; 
+
+export async function getGitInfo(repoPath) {
+  try {
+    const git = simpleGit(repoPath);
+    const log = await git.log({ n: 1 });
+    const branch = await git.revparse(["--abbrev-ref", "HEAD"]);
+
+    if (log.latest) {
+      return `- Commit: ${log.latest.hash}
+      - Branch: ${branch}
+      - Author: ${log.latest.author_name} <${log.latest.author_email}>
+      - Date: ${log.latest.date}`;
+    }
+  } catch {
+    return "Not a git repository";
+  }
+}
+
+export function matchesIncludePatterns(filePath, patterns) {
+  return patterns.some(pattern => minimatch(filePath, pattern, { matchBase: true }));
+}
+
+export function buildTree(dirPath, prefix = "") {
+  let output = "";
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (
+      entry.name === "node_modules" ||
+      entry.name === ".git" ||
+      //entry.name === "package-lock.json" ||
+      entry.name.startsWith(".")
+    ) {
+      continue;
+    }
+
+    output += `${prefix}${entry.name}\n`;
+    if (entry.isDirectory()) {
+      output += buildTree(`${dirPath}/${entry.name}`, `${prefix}  `);
+    }
+  }
+  return output;
+}
+
+export function traverseDir(dirPath, callback) {
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const fullPath = path.join(dirPath, entry.name);
+
+    if (entry.isDirectory()) {
+      traverseDir(fullPath, callback);
+    } else {
+      callback(fullPath);
+    }
+  }
+}
+
+export function readFileContents(filePath) {
+  try {
+    const content = fs.readFileSync(filePath, "utf-8");
+    const lines = content.split("\n").length;
+    return { text: content, lines };
+  } catch {
+    return { text: "", lines: 0 };
+  }
+}
+
+```
+
+
+## Summary
+
+- Total files: 6
+
+- Total lines: 236

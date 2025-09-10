@@ -1,0 +1,20 @@
+{
+  "name": "repository-context-packager",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "A CLI tool to package repository content for LLMs",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./bin/cli.js"
+  },
+  "keywords": [],
+  "author": "Cynthia Fotso",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^14.0.0",
+    "glob": "^11.0.3",
+    "minimatch": "^10.0.3",
+    "simple-git": "^3.28.0"
+  }
+}
