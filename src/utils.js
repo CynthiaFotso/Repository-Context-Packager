@@ -34,7 +34,6 @@ export function buildTree(dirPath, prefix = "") {
     if (
       entry.name === "node_modules" ||
       entry.name === ".git" ||
-      //entry.name === "package-lock.json" ||
       entry.name.startsWith(".")
     ) {
       continue;

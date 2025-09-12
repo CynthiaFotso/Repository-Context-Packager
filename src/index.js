@@ -24,8 +24,13 @@ export async function packageRepo(paths, options) {
   // 3. Structure
   outputParts.push("## Structure\n```\n");
   for (const p of paths) {
-    if (fs.existsSync(p)) {
-      outputParts.push(buildTree(p, "  "));
+   if (fs.existsSync(p)) {
+      const stats = fs.statSync(p);
+      if (stats.isDirectory()) {
+        outputParts.push(buildTree(p, "  ")); //show tree only for directories
+      } else {
+        outputParts.push(path.basename(p) + "\n"); //list a single file
+      }
     } else {
       console.error(`Path not found: ${p}`);
     }
