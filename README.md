@@ -32,7 +32,7 @@ Clone the repository and install dependencies:
 git clone https://github.com/CynthiaFotso/repository-context-packager.git
 cd repository-context-packager
 npm install
-
+```
 Make the CLI available locally:
 npm link # makes the CLI available globally as "repo-packager"
 
