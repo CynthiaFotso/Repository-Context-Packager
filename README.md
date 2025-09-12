@@ -36,7 +36,7 @@ npm install
 
 Make the CLI available locally:
 ```
-npm link # makes the CLI available globally as "repo-packager"
+npm link
 ```
 
 Now you can run the tool globally in your terminal with the command:
@@ -44,22 +44,25 @@ Now you can run the tool globally in your terminal with the command:
 repo-packager
 ```
 
+---
 
 ## 🚀 Usage
 Run the tool from anywhere inside your project:
-Analyze the current directory
+```
+# Analyze the current directory
 repo-packager .
 
-Save output to a file
+# Save output to a file
 repo-packager . -o my-project-context.txt
 
-Only include certain file types
+# Only include certain file types
 repo-packager . --include "*.js"
+```
 
-
+---
 
 ## 📂 Example Output
-
+```
 # Repository Context
 
 ## File System Location
@@ -120,9 +123,26 @@ repo-packager . --include "*.js"
 - Total files: 6
 
 - Total lines: 275
+```
+
+---
+## **Optional Features**
+
+In this project, the optional features that were implemented are: 
+
+1. Output to File:
+```
+tool-name . -o output.txt
+tool-name . --output context-package.md
+```
+2. File Filtering by Extension:
+```
+# Only include JavaScript files
+tool-name . --include "*.js"
+```
 
 ---
 
-##**📜 License**
+## **📜 License**
 
 MIT License © 2025 Cynthia Fotso
