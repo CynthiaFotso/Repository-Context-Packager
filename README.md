@@ -25,21 +25,25 @@ This makes it easier to share your project with Large Language Models instead of
 ---
 
 ## 📦 Installation
+Follow the below instructions step-by-step.
 
 Clone the repository and install dependencies:
-
-```bash
+```
 git clone https://github.com/CynthiaFotso/repository-context-packager.git
 cd repository-context-packager
 npm install
 ```
+
 Make the CLI available locally:
+```
 npm link # makes the CLI available globally as "repo-packager"
+```
 
-Now you can run the tool globally using:
+Now you can run the tool globally in your terminal with the command:
+```
 repo-packager
+```
 
---- 
 
 ## 🚀 Usage
 Run the tool from anywhere inside your project:
@@ -50,9 +54,9 @@ Save output to a file
 repo-packager . -o my-project-context.txt
 
 Only include certain file types
-repo-packager . --include "*.js,*.md"
+repo-packager . --include "*.js"
 
---- 
+
 
 ## 📂 Example Output
 
@@ -119,6 +123,6 @@ repo-packager . --include "*.js,*.md"
 
 ---
 
-📜 License
+##**📜 License**
 
 MIT License © 2025 Cynthia Fotso
