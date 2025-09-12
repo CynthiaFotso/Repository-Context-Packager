@@ -11,31 +11,27 @@ This makes it easier to share your project with Large Language Models instead of
 
 ---
 
-## ✨ Features
+## Features
 
 - Package entire repositories, specific directories, or individual files
 - Display Git info (commit hash, branch, author, date)
 - Show project structure as a tree
 - Include file contents with syntax highlighting
 - Provide summary statistics (total files, total lines)
-- Save to a file (`--output`) or output to terminal (`stdout`) 
+- Save to a file (`--output`) 
 - Optional file filtering with `--include` patterns
 - Automatically skips `node_modules` and hidden files
 
 ---
 
-## 📦 Installation
+## Installation
 Follow the below instructions step-by-step.
 
-Clone the repository and install dependencies:
+Clone the repository and install globally with dependencies:
 ```
-git clone https://github.com/CynthiaFotso/repository-context-packager.git
-cd repository-context-packager
+git clone https://github.com/CynthiaFotso/Repository-Context-Packager.git
+cd Repository-Context-Packager
 npm install
-```
-
-Make the CLI available locally:
-```
 npm link
 ```
 
@@ -46,33 +42,45 @@ repo-packager
 
 ---
 
-## 🚀 Usage
+## Usage
 Run the tool from anywhere inside your project:
 ```
-# Analyze the current directory
+# Package the current directory
 repo-packager .
 
-# Save output to a file
+# Package specific files
+repo-packager src/index.js src/utils.js
+
+# Package with output file
 repo-packager . -o my-project-context.txt
 
-# Only include certain file types
+# Package only JavaScript files
 repo-packager . --include "*.js"
+```
+
+For the basic command line interface,
+```
+# To print the tool name and version
+repo-packager --version or -V
+
+# To print usage information
+repo-packager --help or -h
 ```
 
 ---
 
-## 📂 Example Output
+## Example Output
 ```
 # Repository Context
 
 ## File System Location
-/Users/cynthia/OSD600/Repository-Context-Packager
+/Users/username/Documents/Repository-Context-Packager
 
 ## Git Info
 
 - Commit: 7663b7917fc76abcdcf5391568a192a53aec529d
 - Branch: main
-- Author: Cynthia Fotso <cynthiafotso8@gmail.com>
+- Author: Cynthia Fotso <cynthia@me.com>
 - Date: 2025-09-10T19:20:40-04:00
 
 ## Structure
@@ -126,7 +134,7 @@ repo-packager . --include "*.js"
 ```
 
 ---
-## **Optional Features**
+## Optional Features
 
 In this project, the optional features that were implemented are: 
 
@@ -143,6 +151,6 @@ tool-name . --include "*.js"
 
 ---
 
-## **📜 License**
+##  License
 
 MIT License © 2025 Cynthia Fotso
