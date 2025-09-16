@@ -18,27 +18,55 @@ export async function packageRepo(paths, options) {
 
   // 2. Git info
   outputParts.push("## Git Info\n");
-  const gitInfo = await getGitInfo(paths[0]);
+
+  let repoPath = paths[0];
+  if (fs.existsSync(repoPath)) {
+    const stats = fs.statSync(repoPath);
+    if (stats.isFile()) {
+      repoPath = path.dirname(repoPath); // use parent folder if it's a file
+    }
+  }
+
+  const gitInfo = await getGitInfo(repoPath);
   outputParts.push(gitInfo + "\n");
 
+
   // 3. Structure
-  outputParts.push("## Structure\n```\n");
+  outputParts.push("## Structure\n```");
+
+  const groupedByFolder = {};
+
   for (const p of paths) {
-   if (fs.existsSync(p)) {
+    if (fs.existsSync(p)) {
       const stats = fs.statSync(p);
       if (stats.isDirectory()) {
-        outputParts.push(buildTree(p, "  ")); //show tree only for directories
+        // If it's a directory, show the full tree
+        outputParts.push(buildTree(p, "  "));
       } else {
-        outputParts.push(path.basename(p) + "\n"); //list a single file
+        // Group files by their parent folder
+        const parent = path.basename(path.dirname(p));
+        if (!groupedByFolder[parent]) {
+          groupedByFolder[parent] = [];
+        }
+        groupedByFolder[parent].push(path.basename(p));
       }
     } else {
       console.error(`Path not found: ${p}`);
     }
   }
+
+  // Print grouped files
+  for (const folder in groupedByFolder) {
+    outputParts.push(`${folder}/`);
+    for (const file of groupedByFolder[folder]) {
+      outputParts.push(`  ${file}`);
+    }
+  }
+
   outputParts.push("```\n");
 
   // 4. File contents
-  outputParts.push("## File Contents\n");
+  outputParts.push("## File Contents");
   let totalFiles = 0;
   let totalLines = 0;
 
@@ -55,7 +83,7 @@ export async function packageRepo(paths, options) {
 
         const relPath = path.relative(process.cwd(), filePath);
         const ext = path.extname(filePath).slice(1) || "";
-        outputParts.push(`\n### File: ${relPath}\n`);
+        outputParts.push(`\n### File: ${relPath}`);
         outputParts.push("```" + ext + "\n");
         outputParts.push(text);
         outputParts.push("\n```\n");
