@@ -12,7 +12,7 @@ program
   .argument("<paths...>", "One or more files or directories to analyze")
   .option("-o, --output <file>", "Write output to file")
   
-  .option("--include <patterns>", "Comma-separated glob patterns for files to include (e.g. \"*.js,*.md\")")
+  .option("-i, --include <patterns>", "Comma-separated glob patterns for files to include (e.g. \"*.js,*.md\")")
   
   .parse(process.argv);
 
