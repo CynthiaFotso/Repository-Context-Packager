@@ -39,9 +39,10 @@ export function buildTree(dirPath, prefix = "") {
       continue;
     }
 
-    output += `${prefix}${entry.name}\n`;
+    const name = entry.isDirectory() ? `${entry.name}/` : entry.name;
+    output += `${prefix}${name}\n`;
     if (entry.isDirectory()) {
-      output += buildTree(`${dirPath}/${entry.name}`, `${prefix}  `);
+      output += buildTree(path.join(dirPath, entry.name), `${prefix}  `);
     }
   }
   return output;
@@ -53,6 +54,14 @@ export function traverseDir(dirPath, callback) {
   for (const entry of entries) {
     const fullPath = path.join(dirPath, entry.name);
 
+    if (
+      entry.name === "node_modules" ||
+      entry.name === ".git" ||
+      entry.name.startsWith(".")
+    ) {
+      continue;
+    }
+
     if (entry.isDirectory()) {
       traverseDir(fullPath, callback);
     } else {
@@ -62,11 +71,32 @@ export function traverseDir(dirPath, callback) {
 }
 
 export function readFileContents(filePath) {
-  try {
-    const content = fs.readFileSync(filePath, "utf-8");
-    const lines = content.split("\n").length;
-    return { text: content, lines };
-  } catch {
+  
+    try {
+    const stats = fs.statSync(filePath);
+    const MAX_SIZE = 16 * 1024;
+
+    if (stats.size > MAX_SIZE) {
+      // Read only the first 16KB
+      const buffer = Buffer.alloc(MAX_SIZE);
+      const fd = fs.openSync(filePath, "r");
+      fs.readSync(fd, buffer, 0, MAX_SIZE, 0);
+      fs.closeSync(fd);
+
+      const content = buffer.toString("utf-8");
+      const lines = content.split("\n").length;
+
+      return {
+        text: content + `\n\n⚠️ File truncated: only first 16KB of ${stats.size} bytes included.\n`,
+        lines,
+      };
+    } else {
+      // Normal full read
+      const content = fs.readFileSync(filePath, "utf-8");
+      const lines = content.split("\n").length;
+      return { text: content, lines };
+    }
+  } catch (err) {
     return { text: "", lines: 0 };
   }
 }
