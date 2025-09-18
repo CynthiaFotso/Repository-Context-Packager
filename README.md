@@ -24,6 +24,14 @@ This makes it easier to share your project with Large Language Models instead of
 
 ---
 
+## Prerequisites
+
+- **Node.js** version 18 or higher
+- **npm** (comes with Node.js)
+- **Git** installed and available in your system PATH
+
+---
+
 ## Installation
 Follow the below instructions step-by-step.
 
@@ -32,7 +40,7 @@ Clone the repository and install globally with dependencies:
 git clone https://github.com/CynthiaFotso/Repository-Context-Packager.git
 cd Repository-Context-Packager
 npm install
-npm link
+npm link (#This allows you to run repo-packager from anywhere in your terminal. This step is optional; you can also run the tool using node ./bin/cli.js)
 ```
 
 Now you can run the tool globally in your terminal with the command:
@@ -61,10 +69,12 @@ repo-packager . --include "*.js"
 For the basic command line interface,
 ```
 # To print the tool name and version
-repo-packager --version or -V
+repo-packager --version
+repo-packager -V
 
 # To print usage information
-repo-packager --help or -h
+repo-packager --help
+repo-packager -h
 ```
 
 ---
@@ -85,13 +95,13 @@ repo-packager --help or -h
 
 ## Structure
 
-  bin
+  bin/
     cli.js
   LICENSE
   package-lock.json
   package.json
   README.md
-  src
+  src/
     index.js
     utils.js
 
@@ -140,14 +150,18 @@ In this project, the optional features that were implemented are:
 
 1. Output to File:
 ```
-tool-name . -o output.txt
-tool-name . --output context-package.md
+repo-packager . -o output.txt
+repo-packager . --output context-package.md
 ```
 2. File Filtering by Extension:
 ```
 # Only include JavaScript files
-tool-name . --include "*.js"
+repo-packager . --include "*.js"
+
+# Include multiple extensions
+repo-packager . --include "*.js,*.md"
 ```
+3. Gitignore Integration: Automatically exclude files and directories listed in `.gitignore`
 
 ---
 
