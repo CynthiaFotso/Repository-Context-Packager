@@ -87,7 +87,7 @@ export function readFileContents(filePath) {
       const lines = content.split("\n").length;
 
       return {
-        text: content + `\n\n⚠️ File truncated: only first 16KB of ${stats.size} bytes included.\n`,
+        text: content + `\n\n File truncated: only first 16KB of ${stats.size} bytes included.\n`,
         lines,
       };
     } else {
