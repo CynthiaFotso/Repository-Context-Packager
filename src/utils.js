@@ -22,6 +22,45 @@ export async function getGitInfo(repoPath) {
   }
 }
 
+export async function getRecentlyModifiedFiles(repoPath, days) {
+  try {
+    const git = simpleGit(repoPath);
+    
+    // Calculate the date N days ago
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+    const startDateString = startDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+    
+    // Get files modified since the start date
+    const log = await git.log({
+      since: startDateString,
+      format: { hash: '%H', date: '%ai', message: '%s', author_name: '%an' }
+    });
+    
+    const recentFiles = new Set();
+    
+    // For each commit, get the list of changed files
+    for (const commit of log.all) {
+      try {
+        const show = await git.show([commit.hash, '--name-only', '--pretty=format:']);
+        const files = show.split('\n').filter(file => file.trim() !== '');
+        files.forEach(file => {
+          if (file.trim()) {
+            recentFiles.add(path.resolve(repoPath, file));
+          }
+        });
+      } catch (err) {
+        // If git show fails for a commit, continue with the next one
+        continue;
+      }
+    }
+    
+    return Array.from(recentFiles);
+  } catch (err) {
+    // If git operations fail, fall back to file system timestamps
+  }
+}
+
 export function matchesIncludePatterns(filePath, patterns) {
   return patterns.some(pattern => minimatch(filePath, pattern, { matchBase: true }));
 }
