@@ -22,43 +22,43 @@ export async function getGitInfo(repoPath) {
   }
 }
 
-export async function getRecentlyModifiedFiles(repoPath, days) {
-  try {
-    const git = simpleGit(repoPath);
-    
-    // Calculate the date N days ago
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
-    const startDateString = startDate.toISOString().split('T')[0]; // YYYY-MM-DD format
-    
-    // Get files modified since the start date
-    const log = await git.log({
-      since: startDateString,
-      format: { hash: '%H', date: '%ai', message: '%s', author_name: '%an' }
-    });
-    
-    const recentFiles = new Set();
-    
-    // For each commit, get the list of changed files
-    for (const commit of log.all) {
-      try {
-        const show = await git.show([commit.hash, '--name-only', '--pretty=format:']);
-        const files = show.split('\n').filter(file => file.trim() !== '');
-        files.forEach(file => {
-          if (file.trim()) {
-            recentFiles.add(path.resolve(repoPath, file));
-          }
-        });
-      } catch (err) {
-        // If git show fails for a commit, continue with the next one
-        continue;
-      }
-    }
-    
-    return Array.from(recentFiles);
-  } catch (err) {
-    // If git operations fail, fall back to file system timestamps
+export async function getRecentlyModifiedFiles(repoPath, days = 7) {
+  const git = simpleGit(repoPath);
+  
+  // First, verify this is a git repository
+  const isRepo = await git.checkIsRepo();
+  if (!isRepo) {
+    throw new Error("Not a git repository");
   }
+
+  // Calculate the date N days ago
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+  const startDateString = startDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+  
+  // Get files modified since the cutoff date using raw git command
+  const result = await git.raw(['log', `--since=${startDateString}`, '--pretty=format:%H']);
+  const commitHashes = result.trim().split('\n').filter(hash => hash.trim() !== '');
+  
+  const recentFiles = new Set();
+  
+  // For each commit, get the list of changed files
+  for (const commitHash of commitHashes) {
+    try {
+      const filesResult = await git.raw(['show', commitHash, '--name-only', '--pretty=format:']);
+      const files = filesResult.split('\n').filter(file => file.trim() !== '');
+      files.forEach(file => {
+        if (file.trim()) {
+          recentFiles.add(path.resolve(repoPath, file));
+        }
+      });
+    } catch (err) {
+      // If git show fails for a commit, continue with the next one
+      continue;
+    }
+  }
+  
+  return Array.from(recentFiles);
 }
 
 export function matchesIncludePatterns(filePath, patterns) {
