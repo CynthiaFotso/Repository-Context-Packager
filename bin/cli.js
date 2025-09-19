@@ -13,6 +13,7 @@ program
   .option("-o, --output <file>", "Write output to file")
   
   .option("-i, --include <patterns>", "Comma-separated glob patterns for files to include (e.g. \"*.js,*.md\")")
+  .option("-r, --recent [days]", "Only include files modified within the last N days (default: 7)")
   
   .parse(process.argv);
 
