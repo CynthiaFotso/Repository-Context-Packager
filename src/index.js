@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import {
   getGitInfo,
+  getRecentlyModifiedFiles,
   matchesIncludePatterns,
   buildTree,
   traverseDir,
@@ -29,6 +30,24 @@ export async function packageRepo(paths, options) {
 
   const gitInfo = await getGitInfo(repoPath);
   outputParts.push(gitInfo + "\n");
+
+  // Handle recent changes filter
+  let recentFiles = null;
+  const recentDays = options.recent ? (isNaN(parseInt(options.recent)) ? 7 : parseInt(options.recent)) : null;
+  
+  if (options.recent) {
+    try {
+      recentFiles = await getRecentlyModifiedFiles(repoPath, recentDays);
+      outputParts.push(`## Recent Changes Filter\n`);
+      outputParts.push(`- Filtering files modified within the last ${recentDays} days\n`);
+      outputParts.push(`- Found ${recentFiles.length} recently modified files\n\n`);
+    } catch (err) {
+      console.error(`Error: Cannot use --recent flag. This tool requires a Git repository.`);
+      console.error(`Make sure you are running this command inside a Git repository.`);
+      console.error(`Debug info: ${err.message}`);
+      process.exit(1);
+    }
+  }
 
 
   // 3. Structure
@@ -66,7 +85,11 @@ export async function packageRepo(paths, options) {
   outputParts.push("```\n");
 
   // 4. File contents
-  outputParts.push("## File Contents");
+  const sectionTitle = options.recent 
+    ? `## File Contents (Recent Changes - Last ${recentDays} Days)`
+    : "## File Contents";
+  outputParts.push(sectionTitle);
+  
   let totalFiles = 0;
   let totalLines = 0;
 
@@ -74,7 +97,20 @@ export async function packageRepo(paths, options) {
     ? options.include.split(",").map((p) => p.trim())
     : null;
 
+  const isRecentFile = (filePath) => {
+    if (!recentFiles) return true; // If no recent filter, include all files
+    const absolutePath = path.resolve(filePath);
+    return recentFiles.some(recentPath => 
+      path.resolve(recentPath) === absolutePath
+    );
+  };
+
   const processFile = (filePath) => {
+    // Check if file should be included based on recent filter
+    if (!isRecentFile(filePath)) {
+      return;
+    }
+    
     if (!includePatterns || matchesIncludePatterns(filePath, includePatterns)) {
       const { text, lines } = readFileContents(filePath);
       if (text) {
@@ -114,8 +150,14 @@ export async function packageRepo(paths, options) {
 
   // 5. Summary
   outputParts.push("\n## Summary\n");
-  outputParts.push(`- Total files: ${totalFiles}\n`);
-  outputParts.push(`- Total lines: ${totalLines}\n`);
+  if (options.recent) {
+    outputParts.push(`- Recent changes filter: Last ${recentDays} days\n`);
+    outputParts.push(`- Total recent files processed: ${totalFiles}\n`);
+    outputParts.push(`- Total lines in recent files: ${totalLines}\n`);
+  } else {
+    outputParts.push(`- Total files: ${totalFiles}\n`);
+    outputParts.push(`- Total lines: ${totalLines}\n`);
+  }
 
   const finalOutput = outputParts.join("\n");
 
