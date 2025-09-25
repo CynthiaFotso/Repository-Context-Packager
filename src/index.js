@@ -121,7 +121,12 @@ export async function packageRepo(paths, options) {
         const ext = path.extname(filePath).slice(1) || "";
         outputParts.push(`\n### File: ${relPath}`);
         outputParts.push("```" + ext + "\n");
-        outputParts.push(text);
+        if (options.lineNumbers) {
+          const numberedLines = text.split("\n").map((line, index) => `${index + 1}: ${line}`).join("\n");
+          outputParts.push(numberedLines);
+        } else {
+          outputParts.push(text);
+        }
         outputParts.push("\n```\n");
       }
     }
