@@ -21,6 +21,8 @@ This makes it easier to share your project with Large Language Models instead of
 - Save to a file (`--output`) 
 - Optional file filtering with `--include` patterns
 - Automatically skips `node_modules` and hidden files
+- Display file sizes in file headers
+- Optional line number display in file contents
 
 ---
 
@@ -64,6 +66,9 @@ repo-packager . -o my-project-context.txt
 
 # Package only JavaScript files
 repo-packager . --include "*.js"
+
+# Package with line numbers in a file content
+repo-packager bin/cli.js --line-numbers
 ```
 
 For the basic command line interface,
@@ -111,30 +116,30 @@ repo-packager -h
 
 ```json
 
-{
-  "name": "repository-context-packager",
-  "version": "0.1.0",
-  "type": "module",
-  "description": "A CLI tool to package repository content for LLMs",
-  "main": "src/index.js",
-  "bin": {
-  "repo-packager": "/bin/cli.js"
-  },
+1: {
+2:   "name": "repository-context-packager",
+3:   "version": "0.1.0",
+4:   "type": "module",
+5:   "description": "A CLI tool to package repository content for LLMs",
+6:   "main": "src/index.js",
+7:   "bin": {
+8:     "repo-packager": "/bin/cli.js"
+9:   },
 
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./bin/cli.js"
-  },
-  "keywords": [],
-  "author": "Cynthia Fotso",
-  "license": "MIT",
-  "dependencies": {
-    "commander": "^14.0.0",
-    "glob": "^11.0.3",
-    "minimatch": "^10.0.3",
-    "simple-git": "^3.28.0"
-  }
-}
+10:   "scripts": {
+11:     "test": "echo \"Error: no test specified\" && exit 1",
+12:     "start": "node ./bin/cli.js"
+13:   },
+14:   "keywords": [],
+15:   "author": "Cynthia Fotso",
+16:   "license": "MIT",
+17:   "dependencies": {
+18:     "commander": "^14.0.0",
+19:     "glob": "^11.0.3",
+20:     "minimatch": "^10.0.3",
+21:     "simple-git": "^3.28.0"
+22:   }
+23: }
 
 ## Summary
 
@@ -162,6 +167,27 @@ repo-packager . --include "*.js"
 repo-packager . --include "*.js,*.md"
 ```
 3. Gitignore Integration: Automatically exclude files and directories listed in `.gitignore`
+
+---
+
+## Other Implemented Features
+1. File Size Display: File headers now include file sizes in bytes.
+```
+### File: src/main.js (247 bytes)
+```javascript
+const helper = require('./utils/helper');
+```
+
+2. Line Number Display: Use `--line-numbers` or `-l` flag to include line numbers in file content output.
+```
+### File: src/main.js
+```javascript
+1: const helper = require('./utils/helper');
+2: 
+3: function main() {
+4:   console.log('Hello World');
+5: }
+```
 
 ---
 
