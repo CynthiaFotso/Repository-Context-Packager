@@ -119,7 +119,8 @@ export async function packageRepo(paths, options) {
 
         const relPath = path.relative(process.cwd(), filePath);
         const ext = path.extname(filePath).slice(1) || "";
-        outputParts.push(`\n### File: ${relPath}`);
+        const size = fs.statSync(filePath).size;
+        outputParts.push(`\n### File: ${relPath} (${size} bytes)`);
         outputParts.push("```" + ext + "\n");
         if (options.lineNumbers) {
           const numberedLines = text.split("\n").map((line, index) => `${index + 1}: ${line}`).join("\n");
