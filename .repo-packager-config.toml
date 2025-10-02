@@ -1,4 +1,0 @@
-output = "repo-output.txt"
-include = "*.js,*.md"
-# recent = 7
-line_numbers = true
