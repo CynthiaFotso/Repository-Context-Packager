@@ -84,6 +84,51 @@ repo-packager -h
 
 ---
 
+## Configuration File
+
+You can create a `.repo-packager-config.toml` file in your project root to set default options. This eliminates the need to specify the same command line arguments repeatedly.
+
+### Creating a Config File
+
+Create a file named `.repo-packager-config.toml` in your project root:
+
+```toml
+# Example configuration file for Repository Context Packager
+
+output = "repo-context.txt"
+include = "*.js,*.md,*.json"
+recent = 7
+line_numbers = true
+```
+
+### Config Options
+
+- `output`: Default output file path
+- `include`: Comma-separated glob patterns for files to include  
+- `recent`: Only include files modified within the last N days
+- `line_numbers`: Include line numbers in file content output (true/false)
+
+### Usage with Config File
+
+When a config file exists, the tool will use those values as defaults:
+
+```bash
+# Uses config file defaults
+repo-packager .
+
+# CLI arguments override config file values
+repo-packager . --output "custom-output.txt" --include "*.ts"
+```
+
+### Things to consider while using it
+
+- Config files are automatically ignored by git (added to `.gitignore`)
+- Missing config files are silently ignored
+- Invalid TOML syntax will show an error message and exit
+- CLI arguments always take precedence over config file values
+
+---
+
 ## Example Output
 ```
 # Repository Context
