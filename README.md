@@ -88,6 +88,20 @@ repo-packager -h
 
 You can create a `.repo-packager-config.toml` file in your project root to set default options. This eliminates the need to specify the same command line arguments repeatedly.
 
+**⚠️ Dependencies for TOML Config Feature**:
+
+- **If you're setting up the project for the first time**: The TOML dependency is already included in `package.json`, so just run:
+  ```bash
+  npm install
+  ```
+
+- **If you already have the project installed but are missing the TOML dependency**: Install it separately:
+  ```bash
+  npm install smol-toml
+  ```
+
+- **If you get an error like `Cannot find package 'smol-toml'`**: Run `npm install` to ensure all dependencies are properly installed.
+
 ### Creating a Config File
 
 Create a file named `.repo-packager-config.toml` in your project root:
