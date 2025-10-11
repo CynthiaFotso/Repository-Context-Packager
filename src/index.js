@@ -1,13 +1,14 @@
 import fs from "fs";
 import path from "path";
-import {
-  getGitInfo,
-  getRecentlyModifiedFiles,
-  matchesIncludePatterns,
-  buildTree,
-  traverseDir,
-  readFileContents,
-} from "./utils.js";
+import { getGitInfo, getRecentlyModifiedFiles } 
+  from "./git-utils.js";
+import { 
+  matchesIncludePatterns, 
+  buildTree, 
+  traverseDir, 
+  readFileContents } 
+  from "./fs-utils.js";
+
 
 export async function packageRepo(paths, options) {
   const outputParts = [];

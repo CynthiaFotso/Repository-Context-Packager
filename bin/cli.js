@@ -2,7 +2,7 @@
 
 import { Command } from "commander";
 import { packageRepo } from "../src/index.js";
-import { loadConfig } from "../src/utils.js";
+import { loadConfig } from "../src/config-utils.js";
 
 const program = new Command();
 
