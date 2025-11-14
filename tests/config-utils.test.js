@@ -1,4 +1,4 @@
-import { loadConfig } from "../src/config-utils";
+import { loadConfig } from "../src/config-utils.js";
 import fs from "fs";
 import path from "path";
 import { jest } from '@jest/globals';
