@@ -37,3 +37,6 @@ context-package.*
 repo-context-output.*
 *-context.txt
 *-context.md
+
+# Coverage directory
+coverage/
