@@ -14,7 +14,7 @@ export async function getGitInfo(repoPath) {
 - Date: ${log.latest.date}`;
     }
   } catch {
-    return "Not a git repository";
+    return "Broken Git Information";
   }
 }
 
