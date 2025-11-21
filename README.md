@@ -35,9 +35,16 @@ This makes it easier to share your project with Large Language Models instead of
 ---
 
 ## Installation
-Follow the below instructions step-by-step.
 
-Clone the repository and install globally with dependencies:
+### For Users
+Install globally via npm:
+```
+npm install -g repo-context-packager
+```
+
+This makes the `repo-packager` command available system-wide.
+
+### For Developers
 ```
 git clone https://github.com/CynthiaFotso/Repository-Context-Packager.git
 cd Repository-Context-Packager
