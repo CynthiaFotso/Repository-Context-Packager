@@ -1,6 +1,6 @@
 {
   "name": "repo-context-packager",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "A CLI tool to package repository content for LLMs",
   "repository": {
